@@ -3,8 +3,8 @@ import { Tabs, Button, DatePicker, Table, Input, MessagePlugin } from 'tdesign-r
 import {PrimaryTableCol} from "tdesign-react/es/table/type";
 import {useEffect, useState} from "react";
 import moment from 'moment'
-import {request} from "../../utils/axios";
-import {getAuthMessageRequest, getMessageConfigRequest, getNormalMessageRequest} from "../../utils/apis";
+import {request} from "../../../utils/axios";
+import {getAuthMessageRequest, getMessageConfigRequest, getNormalMessageRequest} from "../../../utils/apis";
 
 const { TabPanel } = Tabs;
 
@@ -102,7 +102,7 @@ export default function ThirdMessage() {
 
     const pageSize = 15
 
-    const defaultTime: [string, string] = [moment().subtract(2, 'hours').format('YYYY-MM-DD HH:mm:ss'), moment().format('YYYY-MM-DD HH:mm:ss')]
+    const defaultTime: [string, string] = [moment().startOf('day').format('YYYY-MM-DD HH:mm:ss'), moment().endOf('day').format('YYYY-MM-DD HH:mm:ss')]
 
     const [selectedTab, setSelectedTab] = useState<string | number>(tabs[0].value)
     const [isTableLoading, setIsTableLoading] = useState<boolean>(false)
@@ -134,8 +134,11 @@ export default function ThirdMessage() {
 
     useEffect(() => {
         getMessageConfig()
-        getTableData()
     }, [])
+
+    useEffect(() => {
+        getTableData()
+    }, [authPage, normalPage])
 
     const initParams = () => {
         setInfoTypeInput('')
@@ -176,7 +179,7 @@ export default function ThirdMessage() {
                         limit: pageSize,
                         offset: (authPage -1) * pageSize,
                         startTime: moment(authTimeInput[0]).valueOf() / 1000,
-                        endTime: moment(authTimeInput[1]).valueOf() / 1000
+                        endTime: parseInt(String(moment(authTimeInput[1]).endOf('day').valueOf() / 1000))
                     }
                 })
                 if (resp.code === 0) {
@@ -267,7 +270,7 @@ export default function ThirdMessage() {
                             pageSize,
                             total: authDataTotal,
                             current: authPage,
-                            showJumper: true,
+                            pageSizeOptions: [15],
                             onCurrentChange:(current) => setAuthPage(current),
                         }}
                     />
@@ -306,7 +309,7 @@ export default function ThirdMessage() {
                             pageSize,
                             total: normalDataTotal,
                             current: normalPage,
-                            showJumper: true,
+                            pageSizeOptions: [15],
                             onCurrentChange:(current) => setNormalPage(current),
                         }}
                     />

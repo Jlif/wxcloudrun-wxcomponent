@@ -36,6 +36,9 @@ RUN apk --update add tzdata && \
     apk del tzdata && \
     rm -rf /var/cache/apk/*
 
+# 兼容云托管开放接口服务
+RUN apk add ca-certificates
+
 # 设置release模式
 ENV GIN_MODE release
 
